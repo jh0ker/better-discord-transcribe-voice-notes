@@ -21,7 +21,7 @@ export default defineConfig(() => ({
       entry: resolve(__dirname, 'src/index.tsx'),
       name: config.name,
       fileName: () => `${config.name}.plugin.js`,
-      formats: ['iife'],
+      formats: ['iife' as const],
     },
     rollupOptions: {
       external: ['react'],
