@@ -20,7 +20,7 @@ export default defineConfig(() => ({
     lib: {
       entry: resolve(__dirname, 'src/index.tsx'),
       name: config.name,
-      fileName: `${config.name}.plugin.js`,
+      fileName: () => `${config.name}.plugin.js`,
       formats: ['iife'],
     },
     rollupOptions: {
