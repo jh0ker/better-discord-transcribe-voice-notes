@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "betterdiscord-plugin-template",
+  "name": "better-discord-transcribe-voice-notes",
   "type": "commonjs",
   "scripts": {
     "build": "tsc && vite build",

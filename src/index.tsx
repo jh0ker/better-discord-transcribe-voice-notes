@@ -7,7 +7,7 @@ module.exports = class extends Plugin {
 
   constructor() {
     super();
-    this.bdApi = new BdApi('TemplatePlugin');
+    this.bdApi = new BdApi('TranscribeVoiceNotes');
   }
 
   protected start(): void {
