@@ -1,31 +1,24 @@
-import React from 'react';
-import { BoundBdApi } from 'betterdiscord';
-
 import { Plugin } from './bd';
-import { WithTranscribeButton } from './components/transcribe-button';
+import { Item, WithTranscribeButton } from './components/transcribe-button';
+import { bdApi } from './lib/shared';
 
 module.exports = class extends Plugin {
-  private bdApi: BoundBdApi;
-
   constructor() {
     super();
-    this.bdApi = new BdApi('TranscribeVoiceNotes');
   }
 
   protected start(): void {
-    this.bdApi.UI.alert('Hello World!', <div>Hello World!</div>);
-
-    const voiceNoteFilter = this.bdApi.Webpack.Filters.byStrings(
+    const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
       '.duration_secs',
       '.waveform',
       '.url'
     );
-    const VoiceNoteComponent = this.bdApi.Webpack.getModule(voiceNoteFilter, {
+    const VoiceNoteComponent = bdApi.Webpack.getModule(voiceNoteFilter, {
       searchExports: true,
     });
     // console.log('VoiceNoteComponent', VoiceNoteComponent);
 
-    const VoiceNoteModule = this.bdApi.Webpack.getModule((m) =>
+    const VoiceNoteModule = bdApi.Webpack.getModule((m) =>
       Object.values(m).includes(VoiceNoteComponent)
     );
 
@@ -46,23 +39,36 @@ module.exports = class extends Plugin {
     //   VoiceNoteModule[voiceNoteComponentKey]
     // );
 
-    this.bdApi.Patcher.instead(
+    bdApi.Patcher.instead(
       VoiceNoteModule,
       voiceNoteComponentKey,
       (thisObject, methodArguments, OriginalComponent) => {
         // console.log('thisObject', thisObject);
         // console.log('methodArguments', methodArguments);
         // console.log('returnValue', originalComponent);
-        return (
-          <WithTranscribeButton>
-            {OriginalComponent(...methodArguments)}
-          </WithTranscribeButton>
-        );
+        try {
+          const props = methodArguments[0] as Record<string, unknown>;
+
+          if (!('item' in props)) {
+            return OriginalComponent(...methodArguments);
+          }
+
+          const item = props['item'] as Item;
+
+          return (
+            <WithTranscribeButton item={item}>
+              {OriginalComponent(...methodArguments)}
+            </WithTranscribeButton>
+          );
+        } catch (e) {
+          console.error(e);
+          return OriginalComponent(...methodArguments);
+        }
       }
     );
   }
 
   protected stop(): void {
-    this.bdApi.Patcher.unpatchAll();
+    bdApi.Patcher.unpatchAll();
   }
 };
