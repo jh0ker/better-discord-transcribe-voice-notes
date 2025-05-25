@@ -23,6 +23,7 @@ export default defineConfig(() => ({
       fileName: () => `${config.name}.plugin.js`,
       formats: ['iife' as const],
     },
+    minify: false,
     rollupOptions: {
       external: ['react'],
       output: {
