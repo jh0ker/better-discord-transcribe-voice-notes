@@ -12,6 +12,10 @@ class TranscribeVoiceNotes implements Plugin {
   }
 
   start(): void {
+    // Store for future use
+    bdApi.Data.save('version', this.meta.version);
+
+    // --- Patches ---
     const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
       '.duration_secs',
       '.waveform',
