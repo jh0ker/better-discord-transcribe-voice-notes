@@ -44,24 +44,27 @@ module.exports = class extends Plugin {
       (thisObject, methodArguments, OriginalComponent) => {
         // console.log('thisObject', thisObject);
         // console.log('methodArguments', methodArguments);
-        // console.log('returnValue', originalComponent);
+        // console.log('returnValue', OriginalComponent);
+
+        const originalNode = OriginalComponent(...methodArguments);
+
         try {
           const props = methodArguments[0] as Record<string, unknown>;
 
           if (!('item' in props)) {
-            return OriginalComponent(...methodArguments);
+            return originalNode;
           }
 
           const item = props['item'] as Item;
 
           return (
             <WithTranscribeButton item={item}>
-              {OriginalComponent(...methodArguments)}
+              {originalNode}
             </WithTranscribeButton>
           );
         } catch (e) {
           console.error(e);
-          return OriginalComponent(...methodArguments);
+          return originalNode;
         }
       }
     );
