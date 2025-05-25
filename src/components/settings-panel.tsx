@@ -1,7 +1,9 @@
+import React from 'react';
 import type { SettingsPanelSetting } from 'betterdiscord';
-import { loadSettings, saveSetting, Settings } from './data';
 
-export const buildSettingsPanel = () => {
+import { loadSettings, saveSetting, Settings } from '../lib/data';
+
+export const SettingsPanel: React.FC = () => {
   const currentSettings = loadSettings();
   const settingsPanelConfig = makeSettingsPanelConfig(currentSettings);
 

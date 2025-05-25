@@ -1,6 +1,6 @@
 import { Plugin } from './bd';
 import { Item, WithTranscribeButton } from './components/transcribe-button';
-import { buildSettingsPanel } from './lib/settingsPanel';
+import { SettingsPanel } from './components/settings-panel';
 import { bdApi } from './lib/shared';
 
 module.exports = class extends Plugin {
@@ -76,6 +76,6 @@ module.exports = class extends Plugin {
   }
 
   getSettingsPanel() {
-    return buildSettingsPanel();
+    return SettingsPanel({});
   }
 };
