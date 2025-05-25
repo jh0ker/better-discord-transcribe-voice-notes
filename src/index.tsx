@@ -1,14 +1,17 @@
-import { Plugin } from './bd';
+import type { Meta, Plugin } from 'betterdiscord/plugin';
+
 import { Item, WithTranscribeButton } from './components/transcribe-button';
 import { SettingsPanel } from './components/settings-panel';
 import { bdApi } from './lib/shared';
 
-module.exports = class extends Plugin {
-  constructor() {
-    super();
+class TranscribeVoiceNotes implements Plugin {
+  meta: Meta;
+
+  constructor(meta: Meta) {
+    this.meta = meta;
   }
 
-  protected start(): void {
+  start(): void {
     const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
       '.duration_secs',
       '.waveform',
@@ -71,11 +74,13 @@ module.exports = class extends Plugin {
     );
   }
 
-  protected stop(): void {
+  stop(): void {
     bdApi.Patcher.unpatchAll();
   }
 
   getSettingsPanel() {
-    return SettingsPanel({});
+    return SettingsPanel;
   }
-};
+}
+
+module.exports = TranscribeVoiceNotes;
