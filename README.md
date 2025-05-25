@@ -1,6 +1,6 @@
 # Transcribe Voice Notes
 
-This plugin allows you to transcribe voice notes in Discord with STT (speech-to-text). It uses the OpenAI Whisper model through their API.
+This plugin allows you to transcribe voice notes in Discord with STT (speech-to-text). It uses the OpenAI API (or compatible APIs). You need to configure your own API key in the plugin settings.
 
 It's built on [@philhk](https://github.com/philhk)'s [BetterDiscord Plugin Template](https://github.com/philhk/betterdiscord-plugin-template) :heart:
 
