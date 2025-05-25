@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { useMutation, QueryClientProvider } from '@tanstack/react-query';
 
-import { openaiClient, queryClient } from '../lib/shared';
+import { openaiClient } from '../lib/shared';
 import {
   loadSettings,
   loadTranscription,
@@ -45,9 +44,13 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
   const [transcription, setTranscription] = useState(
     loadTranscription(item.uniqueId)
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [failureReason, setFailureReason] = useState<unknown | undefined>();
 
   const transcribeItem = useCallback(async () => {
     console.log('Transcribing item', item);
+    setIsLoading(true);
     const settings = loadSettings();
 
     if (settings.api.baseUrl === undefined && settings.api.token === '') {
@@ -58,30 +61,36 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
       return;
     }
 
-    // Download the file
-    const voiceNoteResponse = await fetch(item.originalItem.proxy_url);
-    const voiceNoteBlob = await voiceNoteResponse.blob();
-    const voiceNoteFile = new File([voiceNoteBlob], item.originalItem.filename);
+    try {
+      // Download the file
+      const voiceNoteResponse = await fetch(item.originalItem.proxy_url);
+      const voiceNoteBlob = await voiceNoteResponse.blob();
+      const voiceNoteFile = new File(
+        [voiceNoteBlob],
+        item.originalItem.filename
+      );
 
-    // Run the transcription with the currently configured settings
-    openaiClient.baseURL = settings.api.baseUrl ?? 'https://api.openai.com/v1';
-    openaiClient.apiKey = settings.api.token;
+      // Run the transcription with the currently configured settings
+      openaiClient.baseURL =
+        settings.api.baseUrl ?? 'https://api.openai.com/v1';
+      openaiClient.apiKey = settings.api.token;
 
-    const openaiResponse = await openaiClient.audio.transcriptions.create({
-      file: voiceNoteFile,
-      model: settings.api.model,
-    });
+      const openaiResponse = await openaiClient.audio.transcriptions.create({
+        file: voiceNoteFile,
+        model: settings.api.model,
+      });
 
-    saveTranscription(item.uniqueId, openaiResponse.text);
-    setTranscription(openaiResponse.text);
-
-    return openaiResponse.text;
+      saveTranscription(item.uniqueId, openaiResponse.text);
+      setTranscription(openaiResponse.text);
+      setIsLoading(false);
+      setIsError(false);
+    } catch (e) {
+      setIsLoading(false);
+      setIsError(true);
+      setFailureReason(e);
+      console.error(e);
+    }
   }, [item]);
-
-  const { isLoading, isError, failureReason, mutate } = useMutation(
-    ['transcribe', item.uniqueId],
-    transcribeItem
-  );
 
   return (
     <div
@@ -122,7 +131,7 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
       </p>
       {transcription === undefined && (
         <button
-          onClick={() => mutate()}
+          onClick={transcribeItem}
           style={buttonStyle}
           disabled={isLoading}
         >
@@ -154,9 +163,7 @@ export const WithTranscribeButton: React.FC<WithTranscribeButtonProps> = ({
       }
     >
       <div>{children}</div>
-      <QueryClientProvider client={queryClient}>
-        <TranscribeButton item={item} />
-      </QueryClientProvider>
+      <TranscribeButton item={item} />
     </div>
   );
 };

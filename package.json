@@ -7,7 +7,6 @@
     "watch": "vite build --watch"
   },
   "dependencies": {
-    "@tanstack/react-query": "4",
     "openai": "^4.67.3"
   },
   "devDependencies": {
