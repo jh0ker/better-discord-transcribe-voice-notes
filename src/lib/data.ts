@@ -16,6 +16,10 @@ export const saveTranscription = (itemId: string, transcription: string) => {
   bdApi.Data.save(CACHE_KEY, transcriptionCache);
 };
 
+export const clearTranscriptionCache = () => {
+  bdApi.Data.save(CACHE_KEY, {});
+};
+
 export interface Settings {
   api: {
     type: 'openai';

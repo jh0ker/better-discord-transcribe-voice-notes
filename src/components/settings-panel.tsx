@@ -1,17 +1,40 @@
 import React from 'react';
 import type { SettingsPanelSetting } from 'betterdiscord';
 
-import { loadSettings, saveSetting, Settings } from '../lib/data';
+import {
+  clearTranscriptionCache,
+  loadSettings,
+  saveSetting,
+  Settings,
+} from '../lib/data';
+import { buttonStyle } from '../lib/style';
 
 export const SettingsPanel: React.FC = () => {
   const currentSettings = loadSettings();
   const settingsPanelConfig = makeSettingsPanelConfig(currentSettings);
 
-  return BdApi.UI.buildSettingsPanel({
+  const handleClearCache = () => {
+    clearTranscriptionCache();
+    BdApi.UI.alert(
+      'Success',
+      'The transcription cache has been successfully cleared.'
+    );
+  };
+
+  const panel = BdApi.UI.buildSettingsPanel({
     settings: settingsPanelConfig,
     // @ts-expect-error - TODO: Proper typing would require validation
     onChange: (category, id, value) => saveSetting(category, id, value),
   });
+
+  return (
+    <React.Fragment>
+      {panel}
+      <button style={buttonStyle} onClick={handleClearCache}>
+        Clear transcription cache
+      </button>
+    </React.Fragment>
+  );
 };
 
 function makeSettingsPanelConfig(currentSettings: Settings) {
