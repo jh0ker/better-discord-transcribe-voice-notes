@@ -21,14 +21,13 @@ module.exports = class extends Plugin {
     const VoiceNoteModule = bdApi.Webpack.getModule((m) =>
       Object.values(m).includes(VoiceNoteComponent)
     );
-
     // console.log('VoiceNoteModule', VoiceNoteModule);
 
     const voiceNoteComponentKey = Object.entries(VoiceNoteModule).find(
       ([key, value]) => value === VoiceNoteComponent
     )?.[0];
-
     // console.log('voiceNoteComponentKey', voiceNoteComponentKey);
+
     if (!voiceNoteComponentKey) {
       console.error('Could not find voiceNoteComponentKey');
       return;
