@@ -9,9 +9,9 @@ const OUT_DIR = 'dist';
 export default defineConfig(() => ({
   plugins: [
     banner({
-      content: `/**${Object.entries(config).map(
-        (value) => `\n * @${value[0]} ${value[1]}`
-      )}\n */`,
+      content: `/**${Object.entries(config)
+        .map((value) => `\n * @${value[0]} ${value[1]}`)
+        .join('')}\n */`,
       outDir: OUT_DIR,
     }),
   ],
