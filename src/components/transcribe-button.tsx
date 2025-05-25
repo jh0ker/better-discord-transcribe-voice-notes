@@ -68,21 +68,25 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
 
   return (
     <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'start',
-        gap: '8px',
-      }}
+      style={
+        {
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'start',
+          gap: '8px',
+        } as const
+      }
     >
       <p
-        style={{
-          margin: 0,
-          color: 'var(--text-normal)',
-          lineHeight: '1.375rem',
-          wordWrap: 'break-word',
-          whiteSpace: 'break-spaces',
-        }}
+        style={
+          {
+            margin: 0,
+            color: 'var(--text-normal)',
+            lineHeight: '1.375rem',
+            wordWrap: 'break-word',
+            whiteSpace: 'break-spaces',
+          } as const
+        }
       >
         {isError && (
           <React.Fragment>
@@ -134,12 +138,14 @@ export const WithTranscribeButton: React.FC<WithTranscribeButtonProps> = ({
 }) => {
   return (
     <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'start',
-        gap: '8px',
-      }}
+      style={
+        {
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'start',
+          gap: '8px',
+        } as const
+      }
     >
       <div>{children}</div>
       <QueryClientProvider client={queryClient}>

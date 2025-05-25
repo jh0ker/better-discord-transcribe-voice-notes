@@ -18,7 +18,7 @@ module.exports = class extends Plugin {
     });
     // console.log('VoiceNoteComponent', VoiceNoteComponent);
 
-    const VoiceNoteModule = bdApi.Webpack.getModule((m) =>
+    const VoiceNoteModule: any = bdApi.Webpack.getModule((m) =>
       Object.values(m).includes(VoiceNoteComponent)
     );
     // console.log('VoiceNoteModule', VoiceNoteModule);
