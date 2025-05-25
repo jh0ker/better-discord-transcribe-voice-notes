@@ -1,5 +1,6 @@
 import { Plugin } from './bd';
 import { Item, WithTranscribeButton } from './components/transcribe-button';
+import { buildSettingsPanel } from './lib/settingsPanel';
 import { bdApi } from './lib/shared';
 
 module.exports = class extends Plugin {
@@ -72,5 +73,9 @@ module.exports = class extends Plugin {
 
   protected stop(): void {
     bdApi.Patcher.unpatchAll();
+  }
+
+  getSettingsPanel() {
+    return buildSettingsPanel();
   }
 };

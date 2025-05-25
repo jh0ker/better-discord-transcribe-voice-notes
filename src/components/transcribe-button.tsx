@@ -2,7 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { useMutation, QueryClientProvider } from '@tanstack/react-query';
 
 import { openaiClient, queryClient } from '../lib/shared';
-import { loadTranscription, saveTranscription } from '../lib/data';
+import {
+  loadSettings,
+  loadTranscription,
+  saveTranscription,
+} from '../lib/data';
 
 type OriginalItem = {
   content_scan_version: Number;
@@ -43,16 +47,20 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
 
   const transcribeItem = useCallback(async () => {
     console.log('Transcribing item', item);
+    const settings = loadSettings();
 
     // Download the file
     const voiceNoteResponse = await fetch(item.originalItem.proxy_url);
     const voiceNoteBlob = await voiceNoteResponse.blob();
     const voiceNoteFile = new File([voiceNoteBlob], item.originalItem.filename);
 
-    // Run the transcription
+    // Run the transcription with the currently configured settings
+    openaiClient.baseURL = settings.api.baseUrl ?? 'https://api.openai.com/v1';
+    openaiClient.apiKey = settings.api.token;
+
     const openaiResponse = await openaiClient.audio.transcriptions.create({
       file: voiceNoteFile,
-      model: 'whisper-1',
+      model: settings.api.model,
     });
 
     saveTranscription(item.uniqueId, openaiResponse.text);
