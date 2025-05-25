@@ -49,6 +49,14 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
     console.log('Transcribing item', item);
     const settings = loadSettings();
 
+    if (settings.api.baseUrl === undefined && settings.api.token === '') {
+      BdApi.UI.alert(
+        'Invalid configuration',
+        'Please configure your API access in the plugin settings.'
+      );
+      return;
+    }
+
     // Download the file
     const voiceNoteResponse = await fetch(item.originalItem.proxy_url);
     const voiceNoteBlob = await voiceNoteResponse.blob();
