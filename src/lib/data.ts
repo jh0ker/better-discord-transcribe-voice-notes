@@ -25,7 +25,7 @@ export interface Settings {
     type: 'openai';
     baseUrl: string | undefined;
     token: string;
-    model: string;
+    model: string | undefined;
   };
 }
 
@@ -45,7 +45,7 @@ export const loadSettings = (): Settings => {
       type: 'openai',
       baseUrl: undefined,
       token: '',
-      model: 'whisper-1',
+      model: undefined,
     },
   } satisfies Settings;
 
@@ -62,7 +62,10 @@ export const saveSetting = <T extends SettingsCategory>(
   id: keyof Settings[T],
   value: any
 ) => {
-  if (category === 'api' && id === 'baseUrl' && value === '') {
+  if (
+    (category === 'api' && id === 'baseUrl' && value === '') ||
+    (category === 'api' && id === 'model' && value === '')
+  ) {
     value = undefined;
   }
 

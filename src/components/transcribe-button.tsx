@@ -6,6 +6,10 @@ import {
   saveTranscription,
 } from '../lib/data';
 import { buttonStyle } from '../lib/style';
+import {
+  OPENAI_DEFAULT_BASE_URL,
+  OPENAI_DEFAULT_MODEL,
+} from '../lib/transcription';
 
 type OriginalItem = {
   content_scan_version: Number;
@@ -69,9 +73,9 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
       // Run the transcription with the currently configured settings
       const formData = new FormData();
       formData.append('file', voiceNoteBlob, item.originalItem.filename);
-      formData.append('model', settings.api.model);
+      formData.append('model', settings.api.model ?? OPENAI_DEFAULT_MODEL);
 
-      const baseURL = settings.api.baseUrl ?? 'https://api.openai.com/v1';
+      const baseURL = settings.api.baseUrl ?? OPENAI_DEFAULT_BASE_URL;
       const openaiResponse = await fetch(`${baseURL}/audio/transcriptions`, {
         method: 'POST',
         body: formData,

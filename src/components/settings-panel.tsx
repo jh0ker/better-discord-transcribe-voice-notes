@@ -7,6 +7,10 @@ import {
   saveSetting,
   Settings,
 } from '../lib/data';
+import {
+  OPENAI_DEFAULT_BASE_URL,
+  OPENAI_DEFAULT_MODEL,
+} from '../lib/transcription';
 import { buttonStyle } from '../lib/style';
 
 export const SettingsPanel: React.FC = () => {
@@ -60,7 +64,7 @@ function makeSettingsPanelConfig(currentSettings: Settings) {
           name: 'Base URL',
           note: 'The base URL of the API. Leave empty for default.',
           value: currentSettings.api.baseUrl ?? '',
-          placeholder: 'https://api.openai.com/v1',
+          placeholder: OPENAI_DEFAULT_BASE_URL,
         },
         {
           type: 'text',
@@ -73,8 +77,9 @@ function makeSettingsPanelConfig(currentSettings: Settings) {
           type: 'text',
           id: 'model',
           name: 'Model',
-          note: 'The model to use. OpenAI currently supports "whisper-1", "gpt-4o-mini-transcribe" and "gpt-4o-transcribe".',
-          value: currentSettings.api.model,
+          note: 'The model to use. OpenAI currently supports "whisper-1", "gpt-4o-mini-transcribe" and "gpt-4o-transcribe". Leave empty for default.',
+          value: currentSettings.api.model ?? '',
+          placeholder: OPENAI_DEFAULT_MODEL,
         },
       ],
     },
