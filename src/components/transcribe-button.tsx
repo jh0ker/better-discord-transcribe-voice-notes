@@ -49,7 +49,6 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
 
   const transcribeItem = useCallback(async () => {
     console.log('Transcribing item', item);
-    setIsLoading(true);
     const settings = loadSettings();
 
     if (settings.api.baseUrl === undefined && settings.api.token === '') {
@@ -61,6 +60,8 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
     }
 
     try {
+      setIsLoading(true);
+
       // Download the file
       const voiceNoteResponse = await fetch(item.originalItem.proxy_url);
       const voiceNoteBlob = await voiceNoteResponse.blob();
