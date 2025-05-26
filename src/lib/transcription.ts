@@ -7,7 +7,7 @@ export const OPENAI_DEFAULT_BASE_URL = 'https://api.openai.com/v1';
 export const OPENAI_DEFAULT_MODEL = 'whisper-1';
 
 export const useTranscription = (item: Item) => {
-  const [transcription, setTranscription] = useState(
+  const [transcription, setTranscription] = useState(() =>
     loadTranscription(item.uniqueId)
   );
   const [isLoading, setIsLoading] = useState(false);
