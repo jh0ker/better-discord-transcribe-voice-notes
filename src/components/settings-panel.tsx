@@ -60,6 +60,7 @@ function makeSettingsPanelConfig(currentSettings: Settings) {
           name: 'Base URL',
           note: 'The base URL of the API. Leave empty for default.',
           value: currentSettings.api.baseUrl ?? '',
+          placeholder: 'https://api.openai.com/v1',
         },
         {
           type: 'text',
