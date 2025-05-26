@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
 
-import { openaiClient } from '../lib/shared';
 import {
   loadSettings,
   loadTranscription,
@@ -65,23 +64,27 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
       // Download the file
       const voiceNoteResponse = await fetch(item.originalItem.proxy_url);
       const voiceNoteBlob = await voiceNoteResponse.blob();
-      const voiceNoteFile = new File(
-        [voiceNoteBlob],
-        item.originalItem.filename
-      );
 
       // Run the transcription with the currently configured settings
-      openaiClient.baseURL =
-        settings.api.baseUrl ?? 'https://api.openai.com/v1';
-      openaiClient.apiKey = settings.api.token;
+      const formData = new FormData();
+      formData.append('file', voiceNoteBlob, item.originalItem.filename);
+      formData.append('model', settings.api.model);
 
-      const openaiResponse = await openaiClient.audio.transcriptions.create({
-        file: voiceNoteFile,
-        model: settings.api.model,
+      const baseURL = settings.api.baseUrl ?? 'https://api.openai.com/v1';
+      const openaiResponse = await fetch(`${baseURL}/audio/transcriptions`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${settings.api.token}`,
+        },
       });
+      const openaiResponseJson = await openaiResponse.json();
+      if (!openaiResponse.ok) {
+        throw openaiResponseJson;
+      }
 
-      saveTranscription(item.uniqueId, openaiResponse.text);
-      setTranscription(openaiResponse.text);
+      saveTranscription(item.uniqueId, openaiResponseJson.text);
+      setTranscription(openaiResponseJson.text);
       setIsLoading(false);
       setIsError(false);
     } catch (e) {

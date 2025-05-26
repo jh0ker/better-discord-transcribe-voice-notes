@@ -6,9 +6,7 @@
     "build": "tsc && vite build",
     "watch": "vite build --watch"
   },
-  "dependencies": {
-    "openai": "^4.67.3"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/betterdiscord": "github:zerthox/betterdiscord-types",
     "@types/node": "^18.14.2",
