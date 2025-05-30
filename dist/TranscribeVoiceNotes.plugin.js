@@ -1,6 +1,6 @@
 /**
  * @name TranscribeVoiceNotes
- * @version 0.1.0
+ * @version 0.1.1
  * @author jh0ker
  * @authorId 325250926795554816
  * @description Transcribes voice notes in Discord using STT (speech-to-text). Requires your own OpenAI API key (or compatible API).
@@ -13,6 +13,17 @@ var __publicField = (obj, key, value) => {
 };
 (function(React) {
   "use strict";
+  const buttonStyle = {
+    height: "var(--custom-button-button-sm-height)",
+    transition: "background-color var(--custom-button-transition-duration) ease, color var(--custom-button-transition-duration) ease",
+    padding: "2px 16px",
+    borderRadius: "3px",
+    border: "none",
+    fontSize: 14,
+    lineHeight: "16px",
+    backgroundColor: "var(--brand-500)",
+    color: "var(--white-500)"
+  };
   const bdApi = new BdApi("TranscribeVoiceNotes");
   const CACHE_KEY = `transcriptionCache`;
   const SETTINGS_KEY = `settings`;
@@ -37,7 +48,7 @@ var __publicField = (obj, key, value) => {
         type: "openai",
         baseUrl: void 0,
         token: "",
-        model: "whisper-1"
+        model: void 0
       }
     };
     let category;
@@ -47,7 +58,7 @@ var __publicField = (obj, key, value) => {
     return defaultSettings;
   };
   const saveSetting = (category, id, value) => {
-    if (category === "api" && id === "baseUrl" && value === "") {
+    if (category === "api" && id === "baseUrl" && value === "" || category === "api" && id === "model" && value === "") {
       value = void 0;
     }
     const settings = bdApi.Data.load(SETTINGS_KEY) ?? {};
@@ -57,30 +68,17 @@ var __publicField = (obj, key, value) => {
     settings[category][id] = value;
     bdApi.Data.save(SETTINGS_KEY, settings);
   };
-  const buttonStyle = {
-    height: "var(--custom-button-button-sm-height)",
-    transition: "background-color var(--custom-button-transition-duration) ease, color var(--custom-button-transition-duration) ease",
-    padding: "2px 16px",
-    borderRadius: "3px",
-    border: "none",
-    fontSize: 14,
-    lineHeight: "16px",
-    backgroundColor: "var(--brand-500)",
-    color: "var(--white-500)"
-  };
-  const TranscribeButton = ({ item }) => {
-    if (item.type !== "AUDIO") {
-      return /* @__PURE__ */ BdApi.React.createElement(React.Fragment, null);
-    }
+  const OPENAI_DEFAULT_BASE_URL = "https://api.openai.com/v1";
+  const OPENAI_DEFAULT_MODEL = "whisper-1";
+  const useTranscription = (item) => {
     const [transcription, setTranscription] = React.useState(
-      loadTranscription(item.uniqueId)
+      () => loadTranscription(item.uniqueId)
     );
     const [isLoading, setIsLoading] = React.useState(false);
     const [isError, setIsError] = React.useState(false);
     const [failureReason, setFailureReason] = React.useState();
     const transcribeItem = React.useCallback(async () => {
       console.log("Transcribing item", item);
-      setIsLoading(true);
       const settings = loadSettings();
       if (settings.api.baseUrl === void 0 && settings.api.token === "") {
         BdApi.UI.alert(
@@ -90,12 +88,13 @@ var __publicField = (obj, key, value) => {
         return;
       }
       try {
+        setIsLoading(true);
         const voiceNoteResponse = await fetch(item.originalItem.proxy_url);
         const voiceNoteBlob = await voiceNoteResponse.blob();
         const formData = new FormData();
         formData.append("file", voiceNoteBlob, item.originalItem.filename);
-        formData.append("model", settings.api.model);
-        const baseURL = settings.api.baseUrl ?? "https://api.openai.com/v1";
+        formData.append("model", settings.api.model ?? OPENAI_DEFAULT_MODEL);
+        const baseURL = settings.api.baseUrl ?? OPENAI_DEFAULT_BASE_URL;
         const openaiResponse = await fetch(`${baseURL}/audio/transcriptions`, {
           method: "POST",
           body: formData,
@@ -118,6 +117,19 @@ var __publicField = (obj, key, value) => {
         console.error(e);
       }
     }, [item]);
+    return {
+      transcription,
+      isLoading,
+      isError,
+      failureReason,
+      transcribeItem
+    };
+  };
+  const TranscribeButton = ({ item }) => {
+    if (item.type !== "AUDIO") {
+      return /* @__PURE__ */ BdApi.React.createElement(React.Fragment, null);
+    }
+    const { transcription, isLoading, isError, failureReason, transcribeItem } = useTranscription(item);
     return /* @__PURE__ */ BdApi.React.createElement(
       "div",
       {
@@ -219,7 +231,8 @@ var __publicField = (obj, key, value) => {
             id: "baseUrl",
             name: "Base URL",
             note: "The base URL of the API. Leave empty for default.",
-            value: currentSettings.api.baseUrl ?? ""
+            value: currentSettings.api.baseUrl ?? "",
+            placeholder: OPENAI_DEFAULT_BASE_URL
           },
           {
             type: "text",
@@ -232,8 +245,9 @@ var __publicField = (obj, key, value) => {
             type: "text",
             id: "model",
             name: "Model",
-            note: 'The model to use. OpenAI currently supports "whisper-1", "gpt-4o-mini-transcribe" and "gpt-4o-transcribe".',
-            value: currentSettings.api.model
+            note: 'The model to use. OpenAI currently supports "whisper-1", "gpt-4o-mini-transcribe" and "gpt-4o-transcribe". Leave empty for default.',
+            value: currentSettings.api.model ?? "",
+            placeholder: OPENAI_DEFAULT_MODEL
           }
         ]
       }
