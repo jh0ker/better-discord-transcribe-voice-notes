@@ -1,6 +1,6 @@
 /**
  * @name TranscribeVoiceNotes
- * @version 0.1.1
+ * @version 0.1.2
  * @author jh0ker
  * @authorId 325250926795554816
  * @description Transcribes voice notes in Discord using STT (speech-to-text). Requires your own OpenAI API key (or compatible API).
@@ -145,7 +145,7 @@ var __publicField = (obj, key, value) => {
         {
           style: {
             margin: 0,
-            color: "var(--text-normal)",
+            color: "var(--text-default)",
             lineHeight: "1.375rem",
             wordWrap: "break-word",
             whiteSpace: "break-spaces"
