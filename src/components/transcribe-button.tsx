@@ -54,7 +54,7 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
         style={
           {
             margin: 0,
-            color: 'var(--text-normal)',
+            color: 'var(--text-default)',
             lineHeight: '1.375rem',
             wordWrap: 'break-word',
             whiteSpace: 'break-spaces',
