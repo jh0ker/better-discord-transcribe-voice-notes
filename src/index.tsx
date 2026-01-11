@@ -12,8 +12,7 @@ class TranscribeVoiceNotes implements Plugin {
   }
 
   start(): void {
-    // Store for future use
-    bdApi.Data.save('version', this.meta.version);
+    this.migrate();
 
     // --- Patches ---
     const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
@@ -84,6 +83,34 @@ class TranscribeVoiceNotes implements Plugin {
 
   getSettingsPanel() {
     return SettingsPanel;
+  }
+
+  migrate() {
+    const versionKey = 'version';
+    const previousVersion = bdApi.Data.load(versionKey);
+    const currentVersion = this.meta.version;
+    console.debug('Previous version', previousVersion);
+    console.debug('Current version', currentVersion);
+
+    if (previousVersion === undefined) {
+      console.log('First run');
+      bdApi.Data.save(versionKey, currentVersion);
+      return;
+    } else if (previousVersion === currentVersion) {
+      console.log('No migration needed');
+      return;
+    }
+
+    console.log('Migrating from version', previousVersion, 'to', currentVersion);
+
+    if (bdApi.Utils.semverCompare(previousVersion, '0.1.3') < 0) {
+      console.log('Applying migration to version 0.1.3');
+      // Clear previously stored transcriptions
+      bdApi.Data.delete('transcriptionCache');
+    }
+
+    console.log('Finished migrations');
+    bdApi.Data.save(versionKey, currentVersion);
   }
 }
 
