@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { loadSettings, loadTranscription, saveTranscription } from './data';
+import { loadSettings, transcriptionCache } from './data';
 import type { Item } from '../components/transcribe-button';
 
 export const OPENAI_DEFAULT_BASE_URL = 'https://api.openai.com/v1';
@@ -8,7 +8,7 @@ export const OPENAI_DEFAULT_MODEL = 'whisper-1';
 
 export const useTranscription = (item: Item) => {
   const [transcription, setTranscription] = useState(() =>
-    loadTranscription(item.uniqueId)
+    transcriptionCache.get(item.uniqueId)
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -51,7 +51,7 @@ export const useTranscription = (item: Item) => {
         throw openaiResponseJson;
       }
 
-      saveTranscription(item.uniqueId, openaiResponseJson.text);
+      transcriptionCache.set(item.uniqueId, openaiResponseJson.text);
       setTranscription(openaiResponseJson.text);
       setIsLoading(false);
       setIsError(false);

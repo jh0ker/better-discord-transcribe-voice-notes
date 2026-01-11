@@ -2,7 +2,7 @@ import React from 'react';
 import type { SettingsPanelSetting } from 'betterdiscord';
 
 import {
-  clearTranscriptionCache,
+  transcriptionCache,
   loadSettings,
   saveSetting,
   Settings,
@@ -18,7 +18,7 @@ export const SettingsPanel: React.FC = () => {
   const settingsPanelConfig = makeSettingsPanelConfig(currentSettings);
 
   const handleClearCache = () => {
-    clearTranscriptionCache();
+    transcriptionCache.clear();
     BdApi.UI.alert(
       'Success',
       'The transcription cache has been successfully cleared.'
