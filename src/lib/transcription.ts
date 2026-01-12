@@ -1,10 +1,43 @@
 import { useCallback, useState } from 'react';
 
-import { loadSettings, transcriptionCache } from './data';
+import { loadSettings, transcriptionCache, type Settings } from './data';
 import type { Item } from '../components/transcribe-button';
 
 export const OPENAI_DEFAULT_BASE_URL = 'https://api.openai.com/v1';
 export const OPENAI_DEFAULT_MODEL = 'whisper-1';
+
+export const GROQ_BASE_URL = 'https://api.groq.com/openai/v1';
+export const GROQ_DEFAULT_MODEL = 'whisper-large-v3';
+
+export const CUSTOM_DEFAULT_BASE_URL = OPENAI_DEFAULT_BASE_URL;
+export const CUSTOM_DEFAULT_MODEL = OPENAI_DEFAULT_MODEL;
+
+/** Get the base URL for the configured provider */
+export const getBaseUrl = (
+  settings: Settings['api'],
+  fallback = CUSTOM_DEFAULT_BASE_URL
+) => {
+  switch (settings.provider) {
+    case 'openai':
+      return OPENAI_DEFAULT_BASE_URL;
+    case 'groq':
+      return GROQ_BASE_URL;
+    case 'custom':
+      return settings.baseUrl ?? fallback;
+  }
+};
+
+/** Get the default model for the configured provider */
+export const getDefaultModel = (settings: Settings['api']) => {
+  switch (settings.provider) {
+    case 'openai':
+      return OPENAI_DEFAULT_MODEL;
+    case 'groq':
+      return GROQ_DEFAULT_MODEL;
+    case 'custom':
+      return CUSTOM_DEFAULT_MODEL;
+  }
+};
 
 export const useTranscription = (item: Item) => {
   const [transcription, setTranscription] = useState(() =>
@@ -18,7 +51,11 @@ export const useTranscription = (item: Item) => {
     console.log('Transcribing item', item);
     const settings = loadSettings();
 
-    if (settings.api.baseUrl === undefined && settings.api.token === '') {
+    if (
+      (settings.api.provider === 'custom' &&
+        settings.api.baseUrl === undefined) ||
+      (settings.api.provider !== 'custom' && settings.api.token === '')
+    ) {
       BdApi.UI.alert(
         'Invalid configuration',
         'Please configure your API access in the plugin settings.'
@@ -36,9 +73,12 @@ export const useTranscription = (item: Item) => {
       // Run the transcription with the currently configured settings
       const formData = new FormData();
       formData.append('file', voiceNoteBlob, item.originalItem.filename);
-      formData.append('model', settings.api.model ?? OPENAI_DEFAULT_MODEL);
+      formData.append(
+        'model',
+        settings.api.model ?? getDefaultModel(settings.api)
+      );
 
-      const baseURL = settings.api.baseUrl ?? OPENAI_DEFAULT_BASE_URL;
+      const baseURL = getBaseUrl(settings.api);
       const openaiResponse = await fetch(`${baseURL}/audio/transcriptions`, {
         method: 'POST',
         body: formData,

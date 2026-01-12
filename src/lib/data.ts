@@ -7,6 +7,7 @@ export const transcriptionCache: Map<string, string> = new Map();
 export interface Settings {
   api: {
     type: 'openai';
+    provider: 'custom' | 'openai' | 'groq';
     baseUrl: string | undefined;
     token: string;
     model: string | undefined;
@@ -27,6 +28,7 @@ export const loadSettings = (): Settings => {
   const defaultSettings = {
     api: {
       type: 'openai',
+      provider: 'custom',
       baseUrl: undefined,
       token: '',
       model: undefined,
