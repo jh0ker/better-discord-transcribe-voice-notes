@@ -4,6 +4,8 @@ import { Item, WithTranscribeButton } from './components/transcribe-button';
 import { SettingsPanel } from './components/settings-panel';
 import { bdApi } from './lib/shared';
 
+import styles from './styles.css?raw';
+
 class TranscribeVoiceNotes implements Plugin {
   meta: Meta;
 
@@ -13,6 +15,8 @@ class TranscribeVoiceNotes implements Plugin {
 
   start(): void {
     this.migrate();
+    // --- Styles ---
+    bdApi.DOM.addStyle(this.meta.name, styles);
 
     // --- Patches ---
     const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
@@ -79,6 +83,7 @@ class TranscribeVoiceNotes implements Plugin {
 
   stop(): void {
     bdApi.Patcher.unpatchAll();
+    bdApi.DOM.removeStyle(this.meta.name);
   }
 
   getSettingsPanel() {

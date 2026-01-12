@@ -1,0 +1,25 @@
+.TVN__button__blurple {
+  border: 1px solid transparent;
+
+  background-color: var(--control-primary-background-default);
+  border-color: var(--control-primary-border-default);
+  color: var(--control-primary-text-default);
+}
+
+.TVN__button__blurple:hover {
+  background-color: var(--control-primary-background-hover);
+  border-color: var(--control-primary-border-hover);
+  color: var(--control-primary-text-hover);
+}
+
+.TVN__button__blurple:active {
+  background-color: var(--control-primary-background-active);
+  border-color: var(--control-primary-border-active);
+  color: var(--control-primary-text-active);
+}
+
+.TVN__button__blurple:disabled {
+  background-color: var(--control-primary-background-disabled);
+  border-color: var(--control-primary-border-disabled);
+  color: var(--control-primary-text-disabled);
+}

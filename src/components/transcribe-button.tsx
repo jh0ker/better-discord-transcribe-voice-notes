@@ -78,7 +78,8 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
       {transcription === undefined && (
         <BdApi.Components.Button
           onClick={transcribeItem}
-          color={BdApi.Components.Button.Colors.PRIMARY}
+          className="TVN__button__blurple"
+          color={BdApi.Components.Button.Colors.CUSTOM}
           size={BdApi.Components.Button.Sizes.SMALL}
           disabled={isLoading}
         >
