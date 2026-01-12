@@ -1,9 +1,9 @@
 /**
  * @name TranscribeVoiceNotes
- * @version 0.1.2
+ * @version 0.1.3
  * @author jh0ker
  * @authorId 325250926795554816
- * @description Transcribes voice notes in Discord using STT (speech-to-text). Requires your own OpenAI API key (or compatible API).
+ * @description Transcribes voice notes in Discord using STT (speech-to-text). Requires your own API key (OpenAI or compatible API).
  */
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -25,27 +25,14 @@ var __publicField = (obj, key, value) => {
     color: "var(--white-500)"
   };
   const bdApi = new BdApi("TranscribeVoiceNotes");
-  const CACHE_KEY = `transcriptionCache`;
   const SETTINGS_KEY = `settings`;
-  const loadTranscription = (itemId) => {
-    const transcriptionCache = bdApi.Data.load(CACHE_KEY);
-    if (transcriptionCache) {
-      return transcriptionCache[itemId];
-    }
-  };
-  const saveTranscription = (itemId, transcription) => {
-    const transcriptionCache = bdApi.Data.load(CACHE_KEY) ?? {};
-    transcriptionCache[itemId] = transcription;
-    bdApi.Data.save(CACHE_KEY, transcriptionCache);
-  };
-  const clearTranscriptionCache = () => {
-    bdApi.Data.save(CACHE_KEY, {});
-  };
+  const transcriptionCache = /* @__PURE__ */ new Map();
   const loadSettings = () => {
     const savedSettings = bdApi.Data.load(SETTINGS_KEY) ?? {};
     const defaultSettings = {
       api: {
         type: "openai",
+        provider: "custom",
         baseUrl: void 0,
         token: "",
         model: void 0
@@ -70,9 +57,33 @@ var __publicField = (obj, key, value) => {
   };
   const OPENAI_DEFAULT_BASE_URL = "https://api.openai.com/v1";
   const OPENAI_DEFAULT_MODEL = "whisper-1";
+  const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
+  const GROQ_DEFAULT_MODEL = "whisper-large-v3";
+  const CUSTOM_DEFAULT_BASE_URL = OPENAI_DEFAULT_BASE_URL;
+  const CUSTOM_DEFAULT_MODEL = OPENAI_DEFAULT_MODEL;
+  const getBaseUrl = (settings, fallback = CUSTOM_DEFAULT_BASE_URL) => {
+    switch (settings.provider) {
+      case "openai":
+        return OPENAI_DEFAULT_BASE_URL;
+      case "groq":
+        return GROQ_BASE_URL;
+      case "custom":
+        return settings.baseUrl ?? fallback;
+    }
+  };
+  const getDefaultModel = (settings) => {
+    switch (settings.provider) {
+      case "openai":
+        return OPENAI_DEFAULT_MODEL;
+      case "groq":
+        return GROQ_DEFAULT_MODEL;
+      case "custom":
+        return CUSTOM_DEFAULT_MODEL;
+    }
+  };
   const useTranscription = (item) => {
     const [transcription, setTranscription] = React.useState(
-      () => loadTranscription(item.uniqueId)
+      () => transcriptionCache.get(item.uniqueId)
     );
     const [isLoading, setIsLoading] = React.useState(false);
     const [isError, setIsError] = React.useState(false);
@@ -80,7 +91,7 @@ var __publicField = (obj, key, value) => {
     const transcribeItem = React.useCallback(async () => {
       console.log("Transcribing item", item);
       const settings = loadSettings();
-      if (settings.api.baseUrl === void 0 && settings.api.token === "") {
+      if (settings.api.provider === "custom" && settings.api.baseUrl === void 0 || settings.api.provider !== "custom" && settings.api.token === "") {
         BdApi.UI.alert(
           "Invalid configuration",
           "Please configure your API access in the plugin settings."
@@ -93,8 +104,11 @@ var __publicField = (obj, key, value) => {
         const voiceNoteBlob = await voiceNoteResponse.blob();
         const formData = new FormData();
         formData.append("file", voiceNoteBlob, item.originalItem.filename);
-        formData.append("model", settings.api.model ?? OPENAI_DEFAULT_MODEL);
-        const baseURL = settings.api.baseUrl ?? OPENAI_DEFAULT_BASE_URL;
+        formData.append(
+          "model",
+          settings.api.model ?? getDefaultModel(settings.api)
+        );
+        const baseURL = getBaseUrl(settings.api);
         const openaiResponse = await fetch(`${baseURL}/audio/transcriptions`, {
           method: "POST",
           body: formData,
@@ -106,7 +120,7 @@ var __publicField = (obj, key, value) => {
         if (!openaiResponse.ok) {
           throw openaiResponseJson;
         }
-        saveTranscription(item.uniqueId, openaiResponseJson.text);
+        transcriptionCache.set(item.uniqueId, openaiResponseJson.text);
         setTranscription(openaiResponseJson.text);
         setIsLoading(false);
         setIsError(false);
@@ -193,10 +207,11 @@ var __publicField = (obj, key, value) => {
     );
   };
   const SettingsPanel = () => {
+    const [panelKey, setPanelKey] = React.useState(0);
     const currentSettings = loadSettings();
     const settingsPanelConfig = makeSettingsPanelConfig(currentSettings);
     const handleClearCache = () => {
-      clearTranscriptionCache();
+      transcriptionCache.clear();
       BdApi.UI.alert(
         "Success",
         "The transcription cache has been successfully cleared."
@@ -204,12 +219,44 @@ var __publicField = (obj, key, value) => {
     };
     const panel = BdApi.UI.buildSettingsPanel({
       settings: settingsPanelConfig,
-      // @ts-expect-error - TODO: Proper typing would require validation
-      onChange: (category, id, value) => saveSetting(category, id, value)
+      onChange: (category, id, value) => {
+        if (category === null || id === null)
+          return;
+        saveSetting(category, id, value);
+        if (id === "provider") {
+          setPanelKey((n) => n + 1);
+        }
+      }
     });
-    return /* @__PURE__ */ BdApi.React.createElement(React.Fragment, null, panel, /* @__PURE__ */ BdApi.React.createElement("button", { style: buttonStyle, onClick: handleClearCache }, "Clear transcription cache"));
+    return /* @__PURE__ */ BdApi.React.createElement(React.Fragment, null, /* @__PURE__ */ BdApi.React.createElement("div", { key: panelKey }, panel), /* @__PURE__ */ BdApi.React.createElement("button", { style: buttonStyle, onClick: handleClearCache }, "Clear transcription cache"));
   };
   function makeSettingsPanelConfig(currentSettings) {
+    const provider = currentSettings.api.provider;
+    const isPreset = provider === "openai" || provider === "groq";
+    const baseUrlValue = getBaseUrl(currentSettings.api, "");
+    const modelPlaceholder = getDefaultModel(currentSettings.api);
+    let providerNote;
+    switch (provider) {
+      case "openai":
+        providerNote = "OpenAI requires a paid API key from https://platform.openai.com";
+        break;
+      case "groq":
+        providerNote = "Groq offers a free tier. See rate limits: https://console.groq.com/docs/rate-limits";
+        break;
+      default:
+        providerNote = 'Select a provider preset or use "None" for custom OpenAI-compatible endpoints.';
+        break;
+    }
+    let modelNote;
+    switch (provider) {
+      case "groq":
+        modelNote = 'Groq supports "whisper-large-v3" and "whisper-large-v3-turbo". Leave empty for default.';
+        break;
+      case "openai":
+      case "custom":
+        modelNote = 'OpenAI supports "whisper-1", "gpt-4o-mini-transcribe" and "gpt-4o-transcribe". Leave empty for default.';
+        break;
+    }
     return [
       {
         type: "category",
@@ -219,35 +266,48 @@ var __publicField = (obj, key, value) => {
         settings: [
           {
             type: "dropdown",
-            id: "api-type",
+            id: "type",
             name: "API Type",
-            note: "Currently, only OpenAI or compatible is supported.",
+            note: "The API format to use. Currently, only OpenAI-compatible APIs are supported.",
             value: currentSettings.api.type,
             disabled: true,
-            options: [{ label: "OpenAI", value: "openai" }]
+            options: [{ label: "OpenAI-compatible", value: "openai" }]
+          },
+          {
+            type: "dropdown",
+            id: "provider",
+            name: "Provider Preset",
+            note: providerNote,
+            value: currentSettings.api.provider,
+            options: [
+              { label: "None (Custom)", value: "custom" },
+              { label: "OpenAI", value: "openai" },
+              { label: "Groq (Free tier available)", value: "groq" }
+            ]
           },
           {
             type: "text",
             id: "baseUrl",
             name: "Base URL",
-            note: "The base URL of the API. Leave empty for default.",
-            value: currentSettings.api.baseUrl ?? "",
-            placeholder: OPENAI_DEFAULT_BASE_URL
+            note: isPreset ? "Base URL is set by the provider preset." : "The base URL of the API. Leave empty for OpenAI default.",
+            value: baseUrlValue,
+            placeholder: CUSTOM_DEFAULT_BASE_URL,
+            disabled: isPreset
           },
           {
             type: "text",
             id: "token",
-            name: "Token",
-            note: "The token to use for the API. Will be stored unencrypted on your computer. Required.",
+            name: "API Key",
+            note: "Your API token. Will be stored unencrypted on your computer." + (provider === "custom" ? "" : " Required."),
             value: currentSettings.api.token
           },
           {
             type: "text",
             id: "model",
             name: "Model",
-            note: 'The model to use. OpenAI currently supports "whisper-1", "gpt-4o-mini-transcribe" and "gpt-4o-transcribe". Leave empty for default.',
+            note: modelNote,
             value: currentSettings.api.model ?? "",
-            placeholder: OPENAI_DEFAULT_MODEL
+            placeholder: modelPlaceholder
           }
         ]
       }
@@ -260,7 +320,7 @@ var __publicField = (obj, key, value) => {
     }
     start() {
       var _a;
-      bdApi.Data.save("version", this.meta.version);
+      this.migrate();
       const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
         ".duration_secs",
         ".waveform",
@@ -303,6 +363,28 @@ var __publicField = (obj, key, value) => {
     }
     getSettingsPanel() {
       return SettingsPanel;
+    }
+    migrate() {
+      const versionKey = "version";
+      const previousVersion = bdApi.Data.load(versionKey);
+      const currentVersion = this.meta.version;
+      console.debug("Previous version", previousVersion);
+      console.debug("Current version", currentVersion);
+      if (previousVersion === void 0) {
+        console.log("First run");
+        bdApi.Data.save(versionKey, currentVersion);
+        return;
+      } else if (previousVersion === currentVersion) {
+        console.log("No migration needed");
+        return;
+      }
+      console.log("Migrating from version", previousVersion, "to", currentVersion);
+      if (bdApi.Utils.semverCompare(previousVersion, "0.1.3") < 0) {
+        console.log("Applying migration to version 0.1.3");
+        bdApi.Data.delete("transcriptionCache");
+      }
+      console.log("Finished migrations");
+      bdApi.Data.save(versionKey, currentVersion);
     }
   }
   module.exports = TranscribeVoiceNotes;
