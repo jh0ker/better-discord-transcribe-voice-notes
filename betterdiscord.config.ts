@@ -4,5 +4,5 @@ export default ((): BetterDiscordConfigExport => ({
   author: 'jh0ker',
   authorId: '325250926795554816',
   description:
-    'Transcribes voice notes in Discord using STT (speech-to-text). Requires your own OpenAI API key (or compatible API).',
+    'Transcribes voice notes in Discord using STT (speech-to-text). Requires your own API key (OpenAI or compatible API).',
 }))();
