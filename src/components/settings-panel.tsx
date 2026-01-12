@@ -58,15 +58,32 @@ function makeSettingsPanelConfig(currentSettings: Settings) {
   const baseUrlValue = getBaseUrl(currentSettings.api, '');
   const modelPlaceholder = getDefaultModel(currentSettings.api);
 
-  let providerNote: string;
+  let providerNote: React.ReactNode;
   switch (provider) {
     case 'openai':
-      providerNote =
-        'OpenAI requires a paid API key from https://platform.openai.com';
+      providerNote = (
+        <span>
+          OpenAI requires a paid API key from{' '}
+          <a href="https://platform.openai.com/" target="_blank">
+            https://platform.openai.com/
+          </a>
+          .
+        </span>
+      );
       break;
     case 'groq':
-      providerNote =
-        'Groq offers a free tier. See rate limits: https://console.groq.com/docs/rate-limits';
+      providerNote = (
+        <span>
+          Groq offers a free tier. See{' '}
+          <a
+            href="https://console.groq.com/docs/rate-limits#rate-limits"
+            target="_blank"
+          >
+            https://console.groq.com/docs/rate-limits
+          </a>
+          .
+        </span>
+      );
       break;
     default:
       providerNote =
@@ -107,7 +124,7 @@ function makeSettingsPanelConfig(currentSettings: Settings) {
           type: 'dropdown',
           id: 'provider',
           name: 'Provider Preset',
-          note: providerNote,
+          note: providerNote as string,
           value: currentSettings.api.provider,
           options: [
             { label: 'None (Custom)', value: 'custom' },
