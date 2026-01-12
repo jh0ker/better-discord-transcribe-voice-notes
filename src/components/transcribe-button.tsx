@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { buttonStyle } from '../lib/style';
 import { useTranscription } from '../lib/transcription';
 
 type OriginalItem = {
@@ -77,13 +76,14 @@ const TranscribeButton: React.FC<TranscribeButtonProps> = ({ item }) => {
         {transcription}
       </p>
       {transcription === undefined && (
-        <button
+        <BdApi.Components.Button
           onClick={transcribeItem}
-          style={buttonStyle}
+          color={BdApi.Components.Button.Colors.PRIMARY}
+          size={BdApi.Components.Button.Sizes.SMALL}
           disabled={isLoading}
         >
           {isLoading ? 'Transcribing...' : 'Transcribe'}
-        </button>
+        </BdApi.Components.Button>
       )}
     </div>
   );

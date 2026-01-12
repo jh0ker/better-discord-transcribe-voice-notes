@@ -12,7 +12,6 @@ import {
   getDefaultModel,
   CUSTOM_DEFAULT_BASE_URL,
 } from '../lib/transcription';
-import { buttonStyle } from '../lib/style';
 
 export const SettingsPanel: React.FC = () => {
   const [panelKey, setPanelKey] = useState(0);
@@ -44,9 +43,9 @@ export const SettingsPanel: React.FC = () => {
   return (
     <React.Fragment>
       <div key={panelKey}>{panel}</div>
-      <button style={buttonStyle} onClick={handleClearCache}>
+      <BdApi.Components.Button onClick={handleClearCache}>
         Clear transcription cache
-      </button>
+      </BdApi.Components.Button>
     </React.Fragment>
   );
 };
