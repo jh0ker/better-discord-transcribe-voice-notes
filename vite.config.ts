@@ -24,9 +24,20 @@ function rawCssMultiline(): Plugin {
   };
 }
 
+// Plugin to remove /* @__PURE__ */ comments from output
+function removePureComments(): Plugin {
+  return {
+    name: 'remove-pure-comments',
+    renderChunk(code) {
+      return code.replace(/\/\* @__PURE__ \*\/ /g, '');
+    },
+  };
+}
+
 export default defineConfig(() => ({
   plugins: [
     rawCssMultiline(),
+    removePureComments(),
     prettier({
       parser: 'babel',
       printWidth: 100,
