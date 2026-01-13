@@ -1,5 +1,6 @@
 import { defineConfig, Plugin } from 'vite';
 import banner from 'vite-plugin-banner';
+import prettier from 'rollup-plugin-prettier';
 import { resolve } from 'path';
 import config from './betterdiscord.config';
 
@@ -26,6 +27,11 @@ function rawCssMultiline(): Plugin {
 export default defineConfig(() => ({
   plugins: [
     rawCssMultiline(),
+    prettier({
+      parser: 'babel',
+      printWidth: 100,
+      trailingComma: 'es5',
+    }),
     banner({
       content: `/**${Object.entries(config)
         .map((value) => `\n * @${value[0]} ${value[1]}`)
