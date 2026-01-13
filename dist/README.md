@@ -6,4 +6,4 @@ This plugin allows you to transcribe voice notes in Discord with STT (speech-to-
 
 It's built on [@philhk](https://github.com/philhk)'s [BetterDiscord Plugin Template](https://github.com/philhk/betterdiscord-plugin-template) :heart:
 
-![Preview of the plugin transcribing a message](https://raw.githubusercontent.com/jh0ker/better-discord-transcribe-voice-notes/refs/heads/main/meta/preview_betterdiscord.png)
+![Preview of the plugin transcribing a message](https://raw.githubusercontent.com/jh0ker/better-discord-transcribe-voice-notes/refs/heads/main/meta/preview_github.png)
