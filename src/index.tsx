@@ -22,7 +22,7 @@ class TranscribeVoiceNotes implements Plugin {
     const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
       '.duration_secs',
       '.waveform',
-      '.url'
+      '.url',
     );
     const VoiceNoteComponent = bdApi.Webpack.getModule(voiceNoteFilter, {
       searchExports: true,
@@ -30,12 +30,12 @@ class TranscribeVoiceNotes implements Plugin {
     // console.log('VoiceNoteComponent', VoiceNoteComponent);
 
     const VoiceNoteModule: any = bdApi.Webpack.getModule((m) =>
-      Object.values(m).includes(VoiceNoteComponent)
+      Object.values(m).includes(VoiceNoteComponent),
     );
     // console.log('VoiceNoteModule', VoiceNoteModule);
 
     const voiceNoteComponentKey = Object.entries(VoiceNoteModule).find(
-      ([key, value]) => value === VoiceNoteComponent
+      ([key, value]) => value === VoiceNoteComponent,
     )?.[0];
     // console.log('voiceNoteComponentKey', voiceNoteComponentKey);
 
@@ -77,7 +77,7 @@ class TranscribeVoiceNotes implements Plugin {
           console.error(e);
           return originalNode;
         }
-      }
+      },
     );
   }
 
@@ -106,7 +106,12 @@ class TranscribeVoiceNotes implements Plugin {
       return;
     }
 
-    console.log('Migrating from version', previousVersion, 'to', currentVersion);
+    console.log(
+      'Migrating from version',
+      previousVersion,
+      'to',
+      currentVersion,
+    );
 
     if (bdApi.Utils.semverCompare(previousVersion, '0.1.3') < 0) {
       console.log('Applying migration to version 0.1.3');

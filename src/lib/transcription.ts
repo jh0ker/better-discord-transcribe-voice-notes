@@ -15,7 +15,7 @@ export const CUSTOM_DEFAULT_MODEL = OPENAI_DEFAULT_MODEL;
 /** Get the base URL for the configured provider */
 export const getBaseUrl = (
   settings: Settings['api'],
-  fallback = CUSTOM_DEFAULT_BASE_URL
+  fallback = CUSTOM_DEFAULT_BASE_URL,
 ) => {
   switch (settings.provider) {
     case 'openai':
@@ -41,7 +41,7 @@ export const getDefaultModel = (settings: Settings['api']) => {
 
 export const useTranscription = (item: Item) => {
   const [transcription, setTranscription] = useState(() =>
-    transcriptionCache.get(item.uniqueId)
+    transcriptionCache.get(item.uniqueId),
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -58,7 +58,7 @@ export const useTranscription = (item: Item) => {
     ) {
       BdApi.UI.alert(
         'Invalid configuration',
-        'Please configure your API access in the plugin settings.'
+        'Please configure your API access in the plugin settings.',
       );
       return;
     }
@@ -75,7 +75,7 @@ export const useTranscription = (item: Item) => {
       formData.append('file', voiceNoteBlob, item.originalItem.filename);
       formData.append(
         'model',
-        settings.api.model ?? getDefaultModel(settings.api)
+        settings.api.model ?? getDefaultModel(settings.api),
       );
 
       const baseURL = getBaseUrl(settings.api);

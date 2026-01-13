@@ -46,7 +46,7 @@ export const loadSettings = (): Settings => {
 export const saveSetting = <T extends SettingsCategory>(
   category: T,
   id: keyof Settings[T],
-  value: any
+  value: any,
 ) => {
   if (
     (category === 'api' && id === 'baseUrl' && value === '') ||

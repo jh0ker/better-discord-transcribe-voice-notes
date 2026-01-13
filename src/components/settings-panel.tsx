@@ -23,7 +23,7 @@ export const SettingsPanel: React.FC = () => {
     transcriptionCache.clear();
     BdApi.UI.alert(
       'Success',
-      'The transcription cache has been successfully cleared.'
+      'The transcription cache has been successfully cleared.',
     );
   };
 
