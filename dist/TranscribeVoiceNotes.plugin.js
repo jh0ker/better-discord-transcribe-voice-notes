@@ -1,6 +1,6 @@
 /**
  * @name TranscribeVoiceNotes
- * @version 0.1.3
+ * @version 0.1.4
  * @author jh0ker
  * @authorId 325250926795554816
  * @description Transcribes voice notes in Discord using STT (speech-to-text). Requires your own API key (OpenAI or compatible API).
@@ -13,17 +13,6 @@ var __publicField = (obj, key, value) => {
 };
 (function(React) {
   "use strict";
-  const buttonStyle = {
-    height: "var(--custom-button-button-sm-height)",
-    transition: "background-color var(--custom-button-transition-duration) ease, color var(--custom-button-transition-duration) ease",
-    padding: "2px 16px",
-    borderRadius: "3px",
-    border: "none",
-    fontSize: 14,
-    lineHeight: "16px",
-    backgroundColor: "var(--brand-500)",
-    color: "var(--white-500)"
-  };
   const bdApi = new BdApi("TranscribeVoiceNotes");
   const SETTINGS_KEY = `settings`;
   const transcriptionCache = /* @__PURE__ */ new Map();
@@ -104,10 +93,7 @@ var __publicField = (obj, key, value) => {
         const voiceNoteBlob = await voiceNoteResponse.blob();
         const formData = new FormData();
         formData.append("file", voiceNoteBlob, item.originalItem.filename);
-        formData.append(
-          "model",
-          settings.api.model ?? getDefaultModel(settings.api)
-        );
+        formData.append("model", settings.api.model ?? getDefaultModel(settings.api));
         const baseURL = getBaseUrl(settings.api);
         const openaiResponse = await fetch(`${baseURL}/audio/transcriptions`, {
           method: "POST",
@@ -165,33 +151,38 @@ var __publicField = (obj, key, value) => {
             whiteSpace: "break-spaces"
           }
         },
-        isError && /* @__PURE__ */ BdApi.React.createElement(React.Fragment, null, "Error: ", /* @__PURE__ */ BdApi.React.createElement("br", null), /* @__PURE__ */ BdApi.React.createElement(
-          "pre",
-          {
-            style: {
-              fontFamily: '"Mononoki Nerd Font", Consolas, monospace',
-              whiteSpace: "pre-wrap"
-            }
-          },
-          JSON.stringify(failureReason, null, 2)
-        )),
+        isError && /* @__PURE__ */ BdApi.React.createElement(
+          React.Fragment,
+          null,
+          "Error: ",
+          /* @__PURE__ */ BdApi.React.createElement("br", null),
+          /* @__PURE__ */ BdApi.React.createElement(
+            "pre",
+            {
+              style: {
+                fontFamily: '"Mononoki Nerd Font", Consolas, monospace',
+                whiteSpace: "pre-wrap"
+              }
+            },
+            JSON.stringify(failureReason, null, 2)
+          )
+        ),
         transcription
       ),
       transcription === void 0 && /* @__PURE__ */ BdApi.React.createElement(
-        "button",
+        BdApi.Components.Button,
         {
           onClick: transcribeItem,
-          style: buttonStyle,
+          className: "TVN__button__blurple",
+          color: BdApi.Components.Button.Colors.CUSTOM,
+          size: BdApi.Components.Button.Sizes.SMALL,
           disabled: isLoading
         },
         isLoading ? "Transcribing..." : "Transcribe"
       )
     );
   };
-  const WithTranscribeButton = ({
-    children,
-    item
-  }) => {
+  const WithTranscribeButton = ({ children, item }) => {
     return /* @__PURE__ */ BdApi.React.createElement(
       "div",
       {
@@ -212,10 +203,7 @@ var __publicField = (obj, key, value) => {
     const settingsPanelConfig = makeSettingsPanelConfig(currentSettings);
     const handleClearCache = () => {
       transcriptionCache.clear();
-      BdApi.UI.alert(
-        "Success",
-        "The transcription cache has been successfully cleared."
-      );
+      BdApi.UI.alert("Success", "The transcription cache has been successfully cleared.");
     };
     const panel = BdApi.UI.buildSettingsPanel({
       settings: settingsPanelConfig,
@@ -228,7 +216,16 @@ var __publicField = (obj, key, value) => {
         }
       }
     });
-    return /* @__PURE__ */ BdApi.React.createElement(React.Fragment, null, /* @__PURE__ */ BdApi.React.createElement("div", { key: panelKey }, panel), /* @__PURE__ */ BdApi.React.createElement("button", { style: buttonStyle, onClick: handleClearCache }, "Clear transcription cache"));
+    return /* @__PURE__ */ BdApi.React.createElement(
+      React.Fragment,
+      null,
+      /* @__PURE__ */ BdApi.React.createElement("div", { key: panelKey }, panel),
+      /* @__PURE__ */ BdApi.React.createElement(
+        BdApi.Components.Button,
+        { onClick: handleClearCache },
+        "Clear transcription cache"
+      )
+    );
   };
   function makeSettingsPanelConfig(currentSettings) {
     const provider = currentSettings.api.provider;
@@ -238,10 +235,35 @@ var __publicField = (obj, key, value) => {
     let providerNote;
     switch (provider) {
       case "openai":
-        providerNote = "OpenAI requires a paid API key from https://platform.openai.com";
+        providerNote = /* @__PURE__ */ BdApi.React.createElement(
+          "span",
+          null,
+          "OpenAI requires a paid API key from",
+          " ",
+          /* @__PURE__ */ BdApi.React.createElement(
+            "a",
+            { href: "https://platform.openai.com/", target: "_blank" },
+            "https://platform.openai.com/"
+          ),
+          "."
+        );
         break;
       case "groq":
-        providerNote = "Groq offers a free tier. See rate limits: https://console.groq.com/docs/rate-limits";
+        providerNote = /* @__PURE__ */ BdApi.React.createElement(
+          "span",
+          null,
+          "Groq offers a free tier. See",
+          " ",
+          /* @__PURE__ */ BdApi.React.createElement(
+            "a",
+            {
+              href: "https://console.groq.com/docs/rate-limits#rate-limits",
+              target: "_blank"
+            },
+            "https://console.groq.com/docs/rate-limits"
+          ),
+          "."
+        );
         break;
       default:
         providerNote = 'Select a provider preset or use "None" for custom OpenAI-compatible endpoints.';
@@ -313,6 +335,33 @@ var __publicField = (obj, key, value) => {
       }
     ];
   }
+  const styles = `
+.TVN__button__blurple {
+  border: 1px solid transparent;
+
+  background-color: var(--control-primary-background-default);
+  border-color: var(--control-primary-border-default);
+  color: var(--control-primary-text-default);
+}
+
+.TVN__button__blurple:hover {
+  background-color: var(--control-primary-background-hover);
+  border-color: var(--control-primary-border-hover);
+  color: var(--control-primary-text-hover);
+}
+
+.TVN__button__blurple:active {
+  background-color: var(--control-primary-background-active);
+  border-color: var(--control-primary-border-active);
+  color: var(--control-primary-text-active);
+}
+
+.TVN__button__blurple:disabled {
+  background-color: var(--control-primary-background-disabled);
+  border-color: var(--control-primary-border-disabled);
+  color: var(--control-primary-text-disabled);
+}
+`;
   class TranscribeVoiceNotes {
     constructor(meta) {
       __publicField(this, "meta");
@@ -321,6 +370,7 @@ var __publicField = (obj, key, value) => {
     start() {
       var _a;
       this.migrate();
+      bdApi.DOM.addStyle(this.meta.name, styles);
       const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
         ".duration_secs",
         ".waveform",
@@ -350,7 +400,11 @@ var __publicField = (obj, key, value) => {
               return originalNode;
             }
             const item = props["item"];
-            return /* @__PURE__ */ BdApi.React.createElement(WithTranscribeButton, { item }, originalNode);
+            return /* @__PURE__ */ BdApi.React.createElement(
+              WithTranscribeButton,
+              { item },
+              originalNode
+            );
           } catch (e) {
             console.error(e);
             return originalNode;
@@ -360,6 +414,7 @@ var __publicField = (obj, key, value) => {
     }
     stop() {
       bdApi.Patcher.unpatchAll();
+      bdApi.DOM.removeStyle(this.meta.name);
     }
     getSettingsPanel() {
       return SettingsPanel;
