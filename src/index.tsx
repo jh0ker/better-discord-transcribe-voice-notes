@@ -141,7 +141,7 @@ class TranscribeVoiceNotes implements Plugin {
       currentVersion,
     );
 
-    if (bdApi.Utils.semverCompare(previousVersion, '0.1.3') < 0) {
+    if (bdApi.Utils.semverCompare(previousVersion, '0.1.3') > 0) {
       console.log('Applying migration to version 0.1.3');
       // Clear previously stored transcriptions
       bdApi.Data.delete('transcriptionCache');
