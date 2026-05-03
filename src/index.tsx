@@ -8,12 +8,13 @@ import styles from './styles.css?raw';
 
 class TranscribeVoiceNotes implements Plugin {
   meta: Meta;
+  abortControllerModuleSearch: AbortController | undefined;
 
   constructor(meta: Meta) {
     this.meta = meta;
   }
 
-  start(): void {
+  async start(): Promise<void> {
     this.migrate();
     // --- Styles ---
     bdApi.DOM.addStyle(this.meta.name, styles);
@@ -24,14 +25,39 @@ class TranscribeVoiceNotes implements Plugin {
       '.waveform',
       '.url',
     );
-    const VoiceNoteComponent = bdApi.Webpack.getModule(voiceNoteFilter, {
-      searchExports: true,
-    });
-    // console.log('VoiceNoteComponent', VoiceNoteComponent);
+
+    this.abortControllerModuleSearch?.abort();
+    this.abortControllerModuleSearch = new AbortController();
+    const timeoutSignal = AbortSignal.timeout(3000);
+    const VoiceNoteComponent = await bdApi.Webpack.waitForModule(
+      voiceNoteFilter,
+      {
+        searchExports: true,
+        signal: AbortSignal.any([
+          this.abortControllerModuleSearch.signal,
+          timeoutSignal,
+        ]),
+      },
+    );
+
+    if (this.abortControllerModuleSearch.signal.aborted) {
+      console.warn('Plugin loading aborted');
+      return;
+    } else if (VoiceNoteComponent === undefined) {
+      console.error('Could not find VoiceNoteComponent');
+      this.showPluginLoadingError();
+      return;
+    }
 
     const VoiceNoteModule: any = bdApi.Webpack.getModule((m) =>
       Object.values(m).includes(VoiceNoteComponent),
     );
+
+    if (VoiceNoteModule === undefined) {
+      console.error('Could not find VoiceNoteModule');
+      this.showPluginLoadingError();
+      return;
+    }
     // console.log('VoiceNoteModule', VoiceNoteModule);
 
     const voiceNoteComponentKey = Object.entries(VoiceNoteModule).find(
@@ -41,6 +67,7 @@ class TranscribeVoiceNotes implements Plugin {
 
     if (!voiceNoteComponentKey) {
       console.error('Could not find voiceNoteComponentKey');
+      this.showPluginLoadingError();
       return;
     }
 
@@ -82,6 +109,7 @@ class TranscribeVoiceNotes implements Plugin {
   }
 
   stop(): void {
+    this.abortControllerModuleSearch?.abort();
     bdApi.Patcher.unpatchAll();
     bdApi.DOM.removeStyle(this.meta.name);
   }
@@ -121,6 +149,14 @@ class TranscribeVoiceNotes implements Plugin {
 
     console.log('Finished migrations');
     bdApi.Data.save(versionKey, currentVersion);
+  }
+
+  /** Show errors during load manually, since BetterDiscord swallows them if `start` is async. */
+  showPluginLoadingError() {
+    bdApi.UI.showToast('TranscribeVoiceNotes failed to load', {
+      type: 'error',
+      icon: true,
+    });
   }
 }
 
