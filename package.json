@@ -18,5 +18,5 @@
     "vite": "^4.1.0",
     "vite-plugin-banner": "^0.7.0"
   },
-  "packageManager": "yarn@4.5.0"
+  "packageManager": "yarn@1.22.22"
 }
