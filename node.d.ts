@@ -22,6 +22,8 @@ declare global {
     website?: string;
     /** Link to the source on GitHub of the addon. */
     source?: string;
+    /** Instructs BetterDiscord to initialize the plugin at the specified time. Defaults to `connection`. */
+    runAt?: 'connection' | 'idle';
   }
 }
 
