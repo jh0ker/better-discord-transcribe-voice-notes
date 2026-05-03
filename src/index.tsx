@@ -3,6 +3,7 @@ import type { Meta, Plugin } from 'betterdiscord/plugin';
 import { Item, WithTranscribeButton } from './components/transcribe-button';
 import { SettingsPanel } from './components/settings-panel';
 import { bdApi } from './lib/shared';
+import { CHANGELOG } from './changelog';
 
 import styles from './styles.css?raw';
 
@@ -148,6 +149,17 @@ class TranscribeVoiceNotes implements Plugin {
     }
 
     console.log('Finished migrations');
+
+    const changelog = CHANGELOG[currentVersion];
+    if (previousVersion !== currentVersion && changelog) {
+      console.log('Showing changelog for migration to version', currentVersion);
+      BdApi.UI.showChangelogModal({
+        title: 'Transcribe Voice Notes',
+        subtitle: `version ${this.meta.version}`,
+        ...changelog,
+      });
+    }
+
     bdApi.Data.save(versionKey, currentVersion);
   }
 
