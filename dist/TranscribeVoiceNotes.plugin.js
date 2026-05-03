@@ -1,16 +1,11 @@
 /**
  * @name TranscribeVoiceNotes
- * @version 0.1.4
+ * @version 0.1.5
  * @author jh0ker
  * @authorId 325250926795554816
  * @description Transcribes voice notes in Discord using STT (speech-to-text). Requires your own API key (OpenAI or compatible API).
+ * @runAt idle
  */
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  return value;
-};
 (function(React) {
   "use strict";
   const bdApi = new BdApi("TranscribeVoiceNotes");
@@ -127,10 +122,10 @@ var __publicField = (obj, key, value) => {
   };
   const TranscribeButton = ({ item }) => {
     if (item.type !== "AUDIO") {
-      return /* @__PURE__ */ BdApi.React.createElement(React.Fragment, null);
+      return BdApi.React.createElement(React.Fragment, null);
     }
     const { transcription, isLoading, isError, failureReason, transcribeItem } = useTranscription(item);
-    return /* @__PURE__ */ BdApi.React.createElement(
+    return BdApi.React.createElement(
       "div",
       {
         style: {
@@ -140,7 +135,7 @@ var __publicField = (obj, key, value) => {
           gap: "8px"
         }
       },
-      /* @__PURE__ */ BdApi.React.createElement(
+      BdApi.React.createElement(
         "p",
         {
           style: {
@@ -151,12 +146,12 @@ var __publicField = (obj, key, value) => {
             whiteSpace: "break-spaces"
           }
         },
-        isError && /* @__PURE__ */ BdApi.React.createElement(
+        isError && BdApi.React.createElement(
           React.Fragment,
           null,
           "Error: ",
-          /* @__PURE__ */ BdApi.React.createElement("br", null),
-          /* @__PURE__ */ BdApi.React.createElement(
+          BdApi.React.createElement("br", null),
+          BdApi.React.createElement(
             "pre",
             {
               style: {
@@ -169,7 +164,7 @@ var __publicField = (obj, key, value) => {
         ),
         transcription
       ),
-      transcription === void 0 && /* @__PURE__ */ BdApi.React.createElement(
+      transcription === void 0 && BdApi.React.createElement(
         BdApi.Components.Button,
         {
           onClick: transcribeItem,
@@ -183,7 +178,7 @@ var __publicField = (obj, key, value) => {
     );
   };
   const WithTranscribeButton = ({ children, item }) => {
-    return /* @__PURE__ */ BdApi.React.createElement(
+    return BdApi.React.createElement(
       "div",
       {
         style: {
@@ -193,8 +188,8 @@ var __publicField = (obj, key, value) => {
           gap: "8px"
         }
       },
-      /* @__PURE__ */ BdApi.React.createElement("div", null, children),
-      /* @__PURE__ */ BdApi.React.createElement(TranscribeButton, { item })
+      BdApi.React.createElement("div", null, children),
+      BdApi.React.createElement(TranscribeButton, { item })
     );
   };
   const SettingsPanel = () => {
@@ -208,19 +203,18 @@ var __publicField = (obj, key, value) => {
     const panel = BdApi.UI.buildSettingsPanel({
       settings: settingsPanelConfig,
       onChange: (category, id, value) => {
-        if (category === null || id === null)
-          return;
+        if (category === null || id === null) return;
         saveSetting(category, id, value);
         if (id === "provider") {
           setPanelKey((n) => n + 1);
         }
       }
     });
-    return /* @__PURE__ */ BdApi.React.createElement(
+    return BdApi.React.createElement(
       React.Fragment,
       null,
-      /* @__PURE__ */ BdApi.React.createElement("div", { key: panelKey }, panel),
-      /* @__PURE__ */ BdApi.React.createElement(
+      BdApi.React.createElement("div", { key: panelKey }, panel),
+      BdApi.React.createElement(
         BdApi.Components.Button,
         { onClick: handleClearCache },
         "Clear transcription cache"
@@ -235,12 +229,12 @@ var __publicField = (obj, key, value) => {
     let providerNote;
     switch (provider) {
       case "openai":
-        providerNote = /* @__PURE__ */ BdApi.React.createElement(
+        providerNote = BdApi.React.createElement(
           "span",
           null,
           "OpenAI requires a paid API key from",
           " ",
-          /* @__PURE__ */ BdApi.React.createElement(
+          BdApi.React.createElement(
             "a",
             { href: "https://platform.openai.com/", target: "_blank" },
             "https://platform.openai.com/"
@@ -249,12 +243,12 @@ var __publicField = (obj, key, value) => {
         );
         break;
       case "groq":
-        providerNote = /* @__PURE__ */ BdApi.React.createElement(
+        providerNote = BdApi.React.createElement(
           "span",
           null,
           "Groq offers a free tier. See",
           " ",
-          /* @__PURE__ */ BdApi.React.createElement(
+          BdApi.React.createElement(
             "a",
             {
               href: "https://console.groq.com/docs/rate-limits#rate-limits",
@@ -335,40 +329,55 @@ var __publicField = (obj, key, value) => {
       }
     ];
   }
+  const CHANGELOG = {
+    "0.1.5": {
+      blurb: "New Discord, new problems",
+      changes: [
+        {
+          type: "fixed",
+          title: "Fixed",
+          items: ["The plugin works again", "Button style while transcribing fixed"]
+        },
+        {
+          type: "changed",
+          title: "Internal",
+          items: ["Update build system"]
+        }
+      ]
+    }
+  };
   const styles = `
 .TVN__button__blurple {
-  border: 1px solid transparent;
+  border: 1px solid var(--control-primary-border-default);
 
   background-color: var(--control-primary-background-default);
   border-color: var(--control-primary-border-default);
   color: var(--control-primary-text-default);
 }
 
-.TVN__button__blurple:hover {
+.TVN__button__blurple:hover:not(:disabled) {
   background-color: var(--control-primary-background-hover);
   border-color: var(--control-primary-border-hover);
   color: var(--control-primary-text-hover);
 }
 
-.TVN__button__blurple:active {
+.TVN__button__blurple:active:not(:disabled) {
   background-color: var(--control-primary-background-active);
   border-color: var(--control-primary-border-active);
   color: var(--control-primary-text-active);
 }
 
 .TVN__button__blurple:disabled {
-  background-color: var(--control-primary-background-disabled);
-  border-color: var(--control-primary-border-disabled);
-  color: var(--control-primary-text-disabled);
+  cursor: default;
 }
 `;
   class TranscribeVoiceNotes {
+    meta;
+    abortControllerModuleSearch;
     constructor(meta) {
-      __publicField(this, "meta");
       this.meta = meta;
     }
-    start() {
-      var _a;
+    async start() {
       this.migrate();
       bdApi.DOM.addStyle(this.meta.name, styles);
       const voiceNoteFilter = bdApi.Webpack.Filters.byStrings(
@@ -376,17 +385,35 @@ var __publicField = (obj, key, value) => {
         ".waveform",
         ".url"
       );
-      const VoiceNoteComponent = bdApi.Webpack.getModule(voiceNoteFilter, {
-        searchExports: true
+      this.abortControllerModuleSearch?.abort();
+      this.abortControllerModuleSearch = new AbortController();
+      const timeoutSignal = AbortSignal.timeout(3e3);
+      const VoiceNoteComponent = await bdApi.Webpack.waitForModule(voiceNoteFilter, {
+        searchExports: true,
+        signal: AbortSignal.any([this.abortControllerModuleSearch.signal, timeoutSignal])
       });
+      if (this.abortControllerModuleSearch.signal.aborted) {
+        console.warn("Plugin loading aborted");
+        return;
+      } else if (VoiceNoteComponent === void 0) {
+        console.error("Could not find VoiceNoteComponent");
+        this.showPluginLoadingError();
+        return;
+      }
       const VoiceNoteModule = bdApi.Webpack.getModule(
         (m) => Object.values(m).includes(VoiceNoteComponent)
       );
-      const voiceNoteComponentKey = (_a = Object.entries(VoiceNoteModule).find(
+      if (VoiceNoteModule === void 0) {
+        console.error("Could not find VoiceNoteModule");
+        this.showPluginLoadingError();
+        return;
+      }
+      const voiceNoteComponentKey = Object.entries(VoiceNoteModule).find(
         ([key, value]) => value === VoiceNoteComponent
-      )) == null ? void 0 : _a[0];
+      )?.[0];
       if (!voiceNoteComponentKey) {
         console.error("Could not find voiceNoteComponentKey");
+        this.showPluginLoadingError();
         return;
       }
       bdApi.Patcher.instead(
@@ -400,11 +427,7 @@ var __publicField = (obj, key, value) => {
               return originalNode;
             }
             const item = props["item"];
-            return /* @__PURE__ */ BdApi.React.createElement(
-              WithTranscribeButton,
-              { item },
-              originalNode
-            );
+            return BdApi.React.createElement(WithTranscribeButton, { item }, originalNode);
           } catch (e) {
             console.error(e);
             return originalNode;
@@ -413,6 +436,7 @@ var __publicField = (obj, key, value) => {
       );
     }
     stop() {
+      this.abortControllerModuleSearch?.abort();
       bdApi.Patcher.unpatchAll();
       bdApi.DOM.removeStyle(this.meta.name);
     }
@@ -434,12 +458,28 @@ var __publicField = (obj, key, value) => {
         return;
       }
       console.log("Migrating from version", previousVersion, "to", currentVersion);
-      if (bdApi.Utils.semverCompare(previousVersion, "0.1.3") < 0) {
+      if (bdApi.Utils.semverCompare(previousVersion, "0.1.3") > 0) {
         console.log("Applying migration to version 0.1.3");
         bdApi.Data.delete("transcriptionCache");
       }
       console.log("Finished migrations");
+      const changelog = CHANGELOG[currentVersion];
+      if (previousVersion !== currentVersion && changelog) {
+        console.log("Showing changelog for migration to version", currentVersion);
+        BdApi.UI.showChangelogModal({
+          title: "Transcribe Voice Notes",
+          subtitle: `version ${this.meta.version}`,
+          ...changelog
+        });
+      }
       bdApi.Data.save(versionKey, currentVersion);
+    }
+    /** Show errors during load manually, since BetterDiscord swallows them if `start` is async. */
+    showPluginLoadingError() {
+      bdApi.UI.showToast("TranscribeVoiceNotes failed to load", {
+        type: "error",
+        icon: true
+      });
     }
   }
   module.exports = TranscribeVoiceNotes;

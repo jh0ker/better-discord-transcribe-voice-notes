@@ -1,6 +1,6 @@
 export default ((): BetterDiscordConfigExport => ({
   name: 'TranscribeVoiceNotes',
-  version: '0.1.4',
+  version: '0.1.5',
   author: 'jh0ker',
   authorId: '325250926795554816',
   description:
