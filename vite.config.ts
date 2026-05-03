@@ -1,7 +1,9 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import prettier from 'rollup-plugin-prettier';
 import { defineConfig, Plugin } from 'vite';
 import banner from 'vite-plugin-banner';
-import prettier from 'rollup-plugin-prettier';
-import { resolve } from 'path';
+
 import config from './betterdiscord.config';
 
 // const OUT_DIR = resolve(`${process.env.APPDATA}/BetterDiscord/plugins`); // Use if you want to output in plugins folder directly.
@@ -14,9 +16,8 @@ function rawCssMultiline(): Plugin {
     enforce: 'pre',
     load(id) {
       if (id.endsWith('.css?raw')) {
-        const fs = require('fs');
         const cssPath = id.replace(/\?raw$/, '');
-        const css = fs.readFileSync(cssPath, 'utf-8');
+        const css = readFileSync(cssPath, 'utf-8');
         // Export as a template literal to preserve multiline formatting in output
         return `export default \`\n${css.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$')}\``;
       }

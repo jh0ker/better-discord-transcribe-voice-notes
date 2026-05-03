@@ -9,14 +9,14 @@
   "dependencies": {},
   "devDependencies": {
     "@types/betterdiscord": "github:zerthox/betterdiscord-types",
-    "@types/node": "^18.14.2",
+    "@types/node": "^22.19.17",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "prettier": "^3.7.4",
     "rollup-plugin-prettier": "^4.1.2",
     "typescript": "^5.8.2",
-    "vite": "^4.1.0",
-    "vite-plugin-banner": "^0.7.0"
+    "vite": "^7.3.2",
+    "vite-plugin-banner": "^0.8.1"
   },
   "packageManager": "yarn@1.22.22"
 }
