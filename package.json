@@ -8,7 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/betterdiscord": "github:zerthox/betterdiscord-types",
+    "@types/betterdiscord": "github:jh0ker/betterdiscord-types",
     "@types/node": "^22.19.17",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

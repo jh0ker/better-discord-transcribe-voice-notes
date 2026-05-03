@@ -262,9 +262,9 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.60.2.tgz#3418dcf1388f2abd6b0ccc08fe1ef205ae76d696"
   integrity sha512-Nd/SgG27WoA9e+/TdK74KnHz852TLa94ovOYySo/yMPuTmpckK/jIF2jSwS3g7ELSKXK13/cVdmg1Z/DaCWKxA==
 
-"@types/betterdiscord@github:zerthox/betterdiscord-types":
-  version "1.13.0"
-  resolved "https://codeload.github.com/zerthox/betterdiscord-types/tar.gz/12161e20b8779c4879530403f093678e310bd985"
+"@types/betterdiscord@github:jh0ker/betterdiscord-types":
+  version "1.13.1"
+  resolved "https://codeload.github.com/jh0ker/betterdiscord-types/tar.gz/1d802e5cf569e6a9f72e70bf6ab5dfa9661bfa51"
   dependencies:
     "@types/react-reconciler" "^0.33.0"
     clsx "^2.1.1"
